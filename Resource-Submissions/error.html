@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <?= name ?>,<br/>
+    <br/>
+    We're sorry, but your submission to the shared resources form did not process correctly.<br/>
+    <br/>
+    Here are the submission details:<br/>
+    <!-- Please do not edit this code block. It automatically includes all the form response information from the submission that threw the exception -->
+    <? var data = getDataContent(); ?>
+    <? for (var i=0; i<data.length; i++) { ?>
+    <?= data[i] ?><br/>
+    <? } ?>
+    <br/>
+    The most likely cause of this error is that the resource has not been shared with the account specified in the form instructions. Please double-check your sharing settings, and fill in the form again. 
+    Make sure that you allow editors to change the sharing settings, and that viewers can make a copy of the file.<br/>
+    <br/>
+    A tip to help you fill it in faster: in each of the responses, just press the down arrow on the keyboard to access a list of your entries. This will help you speed things up, instead of typing everything in again.<br/>
+    <br/>
+    This email has been generated automatically. Please do not reply to this address, as it is not monitored regularly. If you have questions, please visit <a href="https://groups.google.com/forum/#!forum/an-example-forum">the Google Group</a>.<br/>
+    <br/>
+    Regards,<br/>
+    The program that checks these kinds of things so a human doesn't have to.
+  </body>
+</html>
+
+
