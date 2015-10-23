@@ -103,7 +103,7 @@ function sendErrorEmail(data) {
   var body = HtmlService.createTemplateFromFile('error');
   body.name = data['Submitted by'][0];
   body = body.evaluate().getContent();
-  GmailApp.sendEmail(recipient, 'ERROR: your training submission failed', body, {htmlBody:body, replyTo:'gfe.trainer.program-noreply@gmail.com'});
+  GmailApp.sendEmail(recipient, 'ERROR: your training submission failed', body, {htmlBody:body, replyTo:'my.gmail.address-noreply@gmail.com'});
 }
 
 function sendConfirmationEmail(data) {
@@ -113,7 +113,7 @@ function sendConfirmationEmail(data) {
   body.sharedFolder = DriveApp.getFolderById(FOLDER_KEY).getUrl();
   body.copyUrl = data['Link to Resource'][0];
   body = body.evaluate().getContent();
-  GmailApp.sendEmail(recipient, 'Shared resources confirmation', body, {htmlBody:body, replyTo:'gfe.trainer.program-noreply@gmail.com'});
+  GmailApp.sendEmail(recipient, 'Shared resources confirmation', body, {htmlBody:body, replyTo:'my.gmail.address-noreply@gmail.com'});
 }
 
 
