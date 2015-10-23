@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <?= name ?>,<br/>
+    <br/>
+    Thanks for your submission to the  Shared Resources folder. We have added your submission to the shared folder, 
+    and placed it in the shared resources database. 
+    Note that others do not have the ability to edit, although they may make a copy of your work to edit it. Please ensure that you allow
+    viewers the ability to make a copy of the resource you've submitted.<br/>
+    <br/>
+    You can access your resource by <a href="<?=copyUrl?>">clicking here</a>.<br/>
+    <br/>
+    Here are the submission details:<br/>
+    <!-- Please do not edit this code block. It automatically includes all the form response information from the submission that threw the exception -->
+    <? var data = getDataContent(); ?>
+    <? for (var i=0; i<data.length; i++) { ?>
+    <?= data[i] ?><br/>
+    <? } ?>
+    <br/>
+    To access the shared resources, you can <a href=<?=sharedFolder?>>open the shared folder in Google Drive</a>, or access the database on 
+    <a href="http://official_website_url">the official website</a>.<br/>
+    <br/>
+    This email has been generated automatically. Please do not reply to this address, as it is not monitored regularly. 
+    If you have questions, please visit <a href="https://groups.google.com/forum/#!forum/an-example-forum">the Google Group</a>.<br/>
+    <br/>
+    Regards,<br/>
+    The program that checks these things so humans don't have to.
+  </body>
+</html>
