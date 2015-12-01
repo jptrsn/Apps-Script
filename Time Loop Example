@@ -1,0 +1,84 @@
+/* Time Loop Example to show how to store and self-trigger a script
+ * Written by James Petersen, http://www.opensourceteacher.ca
+ * Copyright 2015, published under a Creative Commons Attribution-ShareAlike 4.0 International Licence
+ *
+ * This example writes to the ScriptProperties and ScriptCache, which will be the same for all users of this script
+ * For a multi-user script (for example, a web app) a better approach would be to use the UserProperties and UserCache
+ * For a multi-document script (for example, an add-on), a better approach would be to use the DocumentProperties and DocumentCache
+ */
+
+// 5 minute run time. Use this for production
+//var RUN_TIME = 5*60*1000 // total execution time in milliseconds. Should be less than 6 minutes.
+
+// 1 second run time. Use this for testing pause and resume
+var RUN_TIME = 1000 // total execution time in milliseconds. Should be less than 6 minutes.
+
+function main() {
+  var start = new Date();
+  
+  // Example of how to retrieve values stored in the cache
+  // For script-specific values, use ScriptCache
+  // For document-specific, use DocumentCache
+  // For user-specific, use UserCache
+  // See https://developers.google.com/apps-script/reference/cache/cache for more info
+  var cache = CacheService.getScriptCache();
+  var lastValue = cache.get('lastValue');
+  var resumeValue = cache.get('resumeValue');
+  
+  do {
+    var now = new Date();
+    var complete = false;
+    
+    // main loop code goes here
+    // if finished, set complete to true
+    
+    
+  } while (now - start < RUN_TIME && !complete);
+  
+  // If the loop did not complete (i.e. time ran out), store data in cache and resume
+  if (!complete) {
+    
+    // Write any necessary data for resume to the cache
+    // cacheData should be an object of key-value pairs
+    var cacheData = {lastValue:'value1',
+                     resumeValue:'value2',
+                     anotherValue:'value3'};
+    
+    runAgain(cacheData);
+  } else {
+    
+    // Remove any existing trigger created by this script to self-initiate
+    // This will prevent unwanted triggering or the accumulation of irrelevant time-based triggers
+    deleteOldTrigger();
+  }
+}
+
+function runAgain(cacheData) {
+  // Store cache data
+  CacheService.getScriptCache().putAll(cacheData);
+  
+  deleteOldTrigger();
+  
+  // Build a new trigger
+  var newTrigger = ScriptApp.newTrigger('main').timeBased().after(2*60*1000).create();
+  PropertiesService.getScriptProperties().setProperty('runAgainTrigger',newTrigger.getUniqueId());
+  
+}
+
+// Deletes existing trigger with ID that matches the one stored in runAgainTrigger
+function deleteOldTrigger() {
+  // Check for existing resume trigger
+  var oldTrigger = PropertiesService.getScriptProperties().getProperty('runAgainTrigger');
+  
+  // If resume trigger exists, delete it and remove the associated property
+  if (oldTrigger) {
+    var triggers = ScriptApp.getProjectTriggers();
+    for (i in triggers) {
+      if (triggers[i].getUniqueId() == oldTrigger) {
+        ScriptApp.deleteTrigger(triggers[i]);
+        PropertiesService.getScriptProperties().deleteProperty('runAgainTrigger');
+      }
+      return;
+    }
+  }
+}
