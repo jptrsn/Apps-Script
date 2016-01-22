@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!-- Future feature example code: http://jsfiddle.net/dFEE6/ -->
+<html>
+<head>
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+
+<style>
+#spinner {
+width: 100px;
+height: 100px;
+-webkit-animation: sweep 1s infinite linear;
+border-radius:75px;
+border-bottom:5px dotted black;
+margin: 10px auto;
+}
+@-webkit-keyframes sweep { to { -webkit-transform: rotate(360deg); } }
+
+.spinner p{
+text-align:center;
+}
+
+#pages { 
+  list-style-type: none; 
+  margin: 0; 
+  padding: 0; 
+  width: 95%; 
+}
+
+#titlePage { 
+  list-style-type: none; 
+  margin: 0; 
+  padding: 0; 
+  width: 95%; 
+}
+
+#pages li { 
+  margin: 0 5px 5px 5px; 
+  padding: 0.4em; 
+  padding-left: 1.5em; 
+  font-size: 1.4em; 
+  line-height: 22px;
+  height: 18px;
+  overflow:hidden;
+}
+
+#titlePage li { 
+  margin: 0 5px 5px 5px; 
+  padding: 0.4em; 
+  padding-left: 1.5em; 
+  font-size: 1.4em; 
+  line-height: 22px;
+  height: 18px;
+  overflow:hidden;
+}
+
+#pages li span { 
+  position: absolute; 
+  margin-left: -1.3em; 
+}
+
+#titlePage li span { 
+  position: absolute; 
+  margin-left: -1.3em; 
+}
+
+
+</style>
+
+</head>
+
+<body>
+<div class="block" style="margin-bottom:15px">
+  <img src="https://9c6673010e499058adcb9bae72f0524ff749ab70-www.googledrive.com/host/0B9exArxMGDDtaGVtYTFEc2prNW8/pageMover.png" style="width:70px;margin:10px;float:right">
+  <p>Use page mover to quickly reorganize your form pages. You'll need a form with multiple pages for this. Move the pages in the list to the order you want, and click apply.
+  To refresh the order, click refresh.
+  </p>
+  <hr>
+</div>
+
+<div class="block" style="position:relative">
+  <ul id="pages" class="display:none">
+  </ul>
+  <span id="accordion" style="display:hidden"></span>
+</div>
+
+<div id="controls" class="block" style="margin:15px 5px">
+  <button id="reorder" class="action"onclick="reorder()">Reorder</button>
+  <button id="reloadButton" onclick="reloadQuestions()">Refresh</button>
+  <button id="close" onclick="google.script.host.close()">Close</button>
+</div>
+
+<div id="loading" class="block spinner">
+  <div id="spinner"></div>
+  <p>Loading...</p>
+</div>
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script>
+
+$(function() {
+  
+  google.script.run.withSuccessHandler(populateQuestions).withFailureHandler(fail).getQuestions();
+});
+ 
+function showLoading() {
+  //console.log('showLoading');
+  $( "#accordion" ).hide();
+  $( "#loading" ).show();
+  $( "#controls" ).children().prop('disabled',true);
+}
+
+function hideLoading() {
+  //console.log('hideLoading');
+  $( "#loading" ).hide();
+  $( "#controls" ).children().prop('disabled',false);
+}
+
+function reloadQuestions(){ // used
+  showLoading();
+  var pages = $( "#pages" ).hide();
+  pages.empty();
+   
+  google.script.run.withSuccessHandler(populateQuestions).withFailureHandler(fail).getQuestions();
+}
+ 
+function populateQuestions(questions){ 
+   questions = JSON.parse(questions);
+   var pages = $('#pages').fadeIn();
+   pages.empty();
+   var truncTitle = "";
+   var html = '';
+   pages.append(html);
+   
+   if (questions != ""){
+   
+   for (var i = 0; i < questions.length; i++) {
+     truncTitle = trunc(questions[i].title, 35);
+     if (questions[i].qID == '--') {
+     html = '<li title="The start page can\'t be moved" class="ui-state-default ui-state-disabled"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>'+truncTitle+'</li>';
+     } else {
+     html = ' <li title="'+questions[i].title+'" class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>'+truncTitle
+     +"<input type='hidden' name='title' value='"+questions[i].title+"'>"
+     +"<input type='hidden' name='qID' value='"+questions[i].qID+"'>"
+     +"</li>";
+     }
+     pages.append(html);
+   }  // end for
+   
+    $( "#pages" ).sortable({
+      items: "li:not(.ui-state-disabled)",
+      placeholder: "ui-state-highlight"
+    });
+    $( "#pages" ).disableSelection();
+   } else {
+   html = '<p>No valid questions found</p>';
+   $('#accordion').html(html);
+   $('#accordion').show();
+   }
+   hideLoading();
+}
+ 
+function reorder(){
+  showLoading();
+  
+// var pageOrderVisibleText = $('#pages li').map(function(){ return $(this).text(); }).get();
+// var pageOrderIds = $('#pages li').map(function(){ return $(this).find("input[name='qID']").val(); }).get();
+  var pageOrder = $('#pages li').map(function(){ return [$(this).find("input[name='title']").val(),$(this).find("input[name='qID']").val()]; }).get();
+ 
+  google.script.run.withSuccessHandler(hideLoading).reorder(pageOrder);
+}
+
+function fail(){
+  $('#accordion').html("<h3>Fail</h3>");
+  $('#accordion').show();
+}
+
+function trunc(string, n) {
+    return string.length>n ? string.substr(0,n-1)+'&hellip;' : string;
+}
+
+function close(string, n) {
+    google.script.host.close();
+}
+
+</script>
